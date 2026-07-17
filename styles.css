@@ -1,0 +1,123 @@
+:root {
+  color-scheme: light;
+  --bg: #f3f7fb;
+  --card: #ffffff;
+  --text: #1c2434;
+  --subtle: #5f6b7a;
+  --accent: #2f6df6;
+  --accent-soft: #dbe7ff;
+  --border: #e2e8f0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, Segoe UI, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+header,
+main {
+  width: min(1200px, 94vw);
+  margin: 0 auto;
+}
+
+header {
+  padding: 2rem 0 1rem;
+}
+
+header h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+}
+
+header p {
+  color: var(--subtle);
+  max-width: 80ch;
+}
+
+#sources {
+  display: inline-block;
+  background: var(--accent-soft);
+  border-radius: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.kpi {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.8rem;
+  padding: 1rem;
+}
+
+.kpi .label {
+  color: var(--subtle);
+  font-size: 0.85rem;
+}
+
+.kpi .value {
+  margin-top: 0.25rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.8rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.panel h2 {
+  margin-top: 0;
+  font-size: 1.05rem;
+}
+
+.map-panel #mapChart {
+  height: 420px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+th,
+td {
+  border: 1px solid var(--border);
+  padding: 0.5rem;
+  text-align: left;
+}
+
+th {
+  background: #f9fbff;
+}
+
+#patterns {
+  margin: 0;
+  padding-left: 1rem;
+}
+
+#patterns li {
+  margin: 0.45rem 0;
+}

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Global vs India Hiring Trends Dashboard</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Technology Hiring Trends Dashboard</h1>
+      <p>
+        Comparative analytics for Global and Indian job markets across roles,
+        compensation, experience, and tech stack demand.
+      </p>
+      <div id="sources"></div>
+    </header>
+
+    <main>
+      <section class="kpis" id="kpis"></section>
+
+      <section class="panel-grid">
+        <article class="panel">
+          <h2>Role Demand Comparison</h2>
+          <canvas id="rolesChart"></canvas>
+        </article>
+        <article class="panel">
+          <h2>Compensation Comparison</h2>
+          <canvas id="payChart"></canvas>
+        </article>
+        <article class="panel">
+          <h2>Experience Requirement Distribution</h2>
+          <canvas id="experienceChart"></canvas>
+        </article>
+        <article class="panel">
+          <h2>Tech Stack Demand</h2>
+          <canvas id="stackChart"></canvas>
+        </article>
+      </section>
+
+      <section class="panel map-panel">
+        <h2>Hiring Activity Map</h2>
+        <div id="mapChart"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Detailed Comparison Table</h2>
+        <table id="comparisonTable">
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>Global Avg Package (USD)</th>
+              <th>India Avg Package (LPA INR)</th>
+              <th>Global Experience (yrs)</th>
+              <th>India Experience (yrs)</th>
+              <th>Top Global Stack</th>
+              <th>Top India Stack</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <section class="panel">
+        <h2>Automatically Identified Trend Patterns</h2>
+        <ul id="patterns"></ul>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
