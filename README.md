@@ -4,6 +4,8 @@ A working web dashboard to track and compare **global** vs **Indian** technology
 
 ## Features
 - Market comparison across roles, packages, experience bands, and tech stack demand
+- India live hourly hiring tracker on homepage (posted vs deleted jobs)
+- Role/category classification in live tracker with net hourly openings
 - Visual analytics using charts (bar, line, doughnut, radar)
 - Hiring activity map for global and Indian hiring hubs
 - Detailed comparison table for each role and market metrics

@@ -92,6 +92,45 @@ header p {
   font-size: 1.05rem;
 }
 
+.live-tracker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.live-badge {
+  background: #e8fff8;
+  color: #0f8f70;
+  border: 1px solid #b8f0df;
+  border-radius: 999px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.live-tracker-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.7rem;
+  margin: 0.8rem 0 1rem;
+}
+
+.live-tracker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.live-tracker-grid h3 {
+  margin: 0 0 0.6rem;
+  font-size: 0.95rem;
+}
+
+.live-tracker-panel canvas {
+  max-height: 290px;
+}
+
 .map-panel #mapChart {
   height: 420px;
 }

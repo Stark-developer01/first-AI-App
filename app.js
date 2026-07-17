@@ -75,6 +75,79 @@ const marketData = {
 const roles = Object.keys(marketData.global.roles);
 const stackKeys = Object.keys(marketData.global.stack);
 const experienceKeys = Object.keys(marketData.global.experience);
+const indiaRoleCategoryMap = {
+  "AI/ML Engineer": "Data & AI",
+  "Full Stack Developer": "Application Engineering",
+  "Cloud Engineer": "Infrastructure & Platform",
+  "Cybersecurity Analyst": "Security",
+  DevOps: "Infrastructure & Platform",
+};
+
+const indiaLiveHourlySnapshots = [
+  {
+    timestamp: "10:00",
+    roles: {
+      "AI/ML Engineer": { posted: 52, deleted: 11 },
+      "Full Stack Developer": { posted: 74, deleted: 18 },
+      "Cloud Engineer": { posted: 43, deleted: 9 },
+      "Cybersecurity Analyst": { posted: 31, deleted: 7 },
+      DevOps: { posted: 47, deleted: 10 },
+    },
+  },
+  {
+    timestamp: "11:00",
+    roles: {
+      "AI/ML Engineer": { posted: 55, deleted: 12 },
+      "Full Stack Developer": { posted: 79, deleted: 20 },
+      "Cloud Engineer": { posted: 46, deleted: 9 },
+      "Cybersecurity Analyst": { posted: 30, deleted: 8 },
+      DevOps: { posted: 49, deleted: 11 },
+    },
+  },
+  {
+    timestamp: "12:00",
+    roles: {
+      "AI/ML Engineer": { posted: 57, deleted: 13 },
+      "Full Stack Developer": { posted: 82, deleted: 21 },
+      "Cloud Engineer": { posted: 44, deleted: 10 },
+      "Cybersecurity Analyst": { posted: 34, deleted: 7 },
+      DevOps: { posted: 51, deleted: 11 },
+    },
+  },
+  {
+    timestamp: "13:00",
+    roles: {
+      "AI/ML Engineer": { posted: 54, deleted: 12 },
+      "Full Stack Developer": { posted: 77, deleted: 19 },
+      "Cloud Engineer": { posted: 45, deleted: 10 },
+      "Cybersecurity Analyst": { posted: 35, deleted: 8 },
+      DevOps: { posted: 53, deleted: 12 },
+    },
+  },
+  {
+    timestamp: "14:00",
+    roles: {
+      "AI/ML Engineer": { posted: 60, deleted: 14 },
+      "Full Stack Developer": { posted: 84, deleted: 22 },
+      "Cloud Engineer": { posted: 49, deleted: 10 },
+      "Cybersecurity Analyst": { posted: 33, deleted: 8 },
+      DevOps: { posted: 54, deleted: 12 },
+    },
+  },
+  {
+    timestamp: "15:00",
+    roles: {
+      "AI/ML Engineer": { posted: 58, deleted: 13 },
+      "Full Stack Developer": { posted: 80, deleted: 20 },
+      "Cloud Engineer": { posted: 50, deleted: 11 },
+      "Cybersecurity Analyst": { posted: 36, deleted: 8 },
+      DevOps: { posted: 56, deleted: 12 },
+    },
+  },
+];
+
+let indiaLiveRoleChart;
+let indiaLiveSnapshotIndex = 0;
 
 function renderSources() {
   document.getElementById("sources").textContent = `Data snapshots aggregated from: ${marketData.sources.join(
@@ -313,8 +386,90 @@ function correlation(a, b) {
   return numerator / (denA * denB);
 }
 
+function aggregateCategoryMetrics(snapshot) {
+  return Object.entries(snapshot.roles).reduce((acc, [role, counts]) => {
+    const category = indiaRoleCategoryMap[role] || "Other";
+    if (!acc[category]) {
+      acc[category] = { posted: 0, deleted: 0 };
+    }
+    acc[category].posted += counts.posted;
+    acc[category].deleted += counts.deleted;
+    return acc;
+  }, {});
+}
+
+function updateIndiaLiveTracker(snapshot) {
+  const postedTotal = Object.values(snapshot.roles).reduce((sum, item) => sum + item.posted, 0);
+  const deletedTotal = Object.values(snapshot.roles).reduce((sum, item) => sum + item.deleted, 0);
+  const netTotal = postedTotal - deletedTotal;
+
+  document.getElementById("indiaLiveTimestamp").textContent = `Live hour: ${snapshot.timestamp} IST`;
+  document.getElementById("indiaLiveKpis").innerHTML = [
+    { label: "Jobs Posted / Hour", value: postedTotal },
+    { label: "Jobs Deleted / Hour", value: deletedTotal },
+    { label: "Net Openings / Hour", value: netTotal },
+    { label: "Tracked Roles", value: Object.keys(snapshot.roles).length },
+  ]
+    .map(
+      (item) =>
+        `<article class="kpi"><div class="label">${item.label}</div><div class="value">${item.value}</div></article>`
+    )
+    .join("");
+
+  const roleNames = Object.keys(snapshot.roles);
+  const postedByRole = roleNames.map((role) => snapshot.roles[role].posted);
+  const deletedByRole = roleNames.map((role) => snapshot.roles[role].deleted);
+
+  if (!indiaLiveRoleChart) {
+    indiaLiveRoleChart = new Chart(document.getElementById("indiaLiveRoleChart"), {
+      type: "bar",
+      data: {
+        labels: roleNames,
+        datasets: [
+          {
+            label: "Posted/hr",
+            data: postedByRole,
+            backgroundColor: "rgba(21, 195, 154, 0.75)",
+          },
+          {
+            label: "Deleted/hr",
+            data: deletedByRole,
+            backgroundColor: "rgba(239, 68, 68, 0.75)",
+          },
+        ],
+      },
+      options: { responsive: true, maintainAspectRatio: false },
+    });
+  } else {
+    indiaLiveRoleChart.data.labels = roleNames;
+    indiaLiveRoleChart.data.datasets[0].data = postedByRole;
+    indiaLiveRoleChart.data.datasets[1].data = deletedByRole;
+    indiaLiveRoleChart.update();
+  }
+
+  const categoryMetrics = aggregateCategoryMetrics(snapshot);
+  const categoryRows = Object.entries(categoryMetrics).map(
+    ([category, metrics]) => `<tr>
+      <td>${category}</td>
+      <td>${metrics.posted}</td>
+      <td>${metrics.deleted}</td>
+      <td>${metrics.posted - metrics.deleted}</td>
+    </tr>`
+  );
+  document.querySelector("#indiaLiveCategoryTable tbody").innerHTML = categoryRows.join("");
+}
+
+function renderIndiaLiveTracker() {
+  updateIndiaLiveTracker(indiaLiveHourlySnapshots[indiaLiveSnapshotIndex]);
+  setInterval(() => {
+    indiaLiveSnapshotIndex = (indiaLiveSnapshotIndex + 1) % indiaLiveHourlySnapshots.length;
+    updateIndiaLiveTracker(indiaLiveHourlySnapshots[indiaLiveSnapshotIndex]);
+  }, 8000);
+}
+
 renderSources();
 renderKpis();
+renderIndiaLiveTracker();
 renderCharts();
 renderMap();
 renderTable();

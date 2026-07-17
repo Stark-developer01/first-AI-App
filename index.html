@@ -21,6 +21,34 @@
     <main>
       <section class="kpis" id="kpis"></section>
 
+      <section class="panel live-tracker-panel">
+        <div class="live-tracker-header">
+          <h2>India Live Hiring Tracker (Hourly)</h2>
+          <span id="indiaLiveTimestamp" class="live-badge"></span>
+        </div>
+        <div class="live-tracker-kpis" id="indiaLiveKpis"></div>
+        <div class="live-tracker-grid">
+          <article>
+            <h3>Posted vs Deleted Jobs by Role</h3>
+            <canvas id="indiaLiveRoleChart"></canvas>
+          </article>
+          <article>
+            <h3>Posted vs Deleted Jobs by Category</h3>
+            <table id="indiaLiveCategoryTable">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Posted/hr</th>
+                  <th>Deleted/hr</th>
+                  <th>Net/hr</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </article>
+        </div>
+      </section>
+
       <section class="panel-grid">
         <article class="panel">
           <h2>Role Demand Comparison</h2>
