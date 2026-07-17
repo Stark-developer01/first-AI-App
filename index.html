@@ -1,65 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tech Hiring Trends Dashboard</title>
-  <link rel="stylesheet" href="styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-  <header class="topbar">
-    <h1>Tech Hiring Trends Dashboard</h1>
-    <nav>
-      <a class="active" href="index.html">Home</a>
-      <a href="global-patterns.html">Global Patterns</a>
-    </nav>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Global vs India Hiring Trends Dashboard</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Technology Hiring Trends Dashboard</h1>
+      <p>
+        Comparative analytics for Global and Indian job markets across roles,
+        compensation, experience, and tech stack demand.
+      </p>
+      <div id="sources"></div>
+    </header>
 
-  <main class="container">
-    <section class="hero">
-      <h2>Global vs India Job Market Snapshot</h2>
-      <p>Track technology hiring trends by role, experience level, salary range, and required tech stack.</p>
-      <div class="kpi-grid" id="kpiGrid"></div>
-    </section>
+    <main>
+      <section class="kpis" id="kpis"></section>
 
-    <section class="grid-two">
-      <article class="card">
-        <h3>Role-wise Hiring Demand</h3>
-        <canvas id="roleChart"></canvas>
-      </article>
-      <article class="card">
-        <h3>Experience-wise Openings</h3>
-        <canvas id="experienceChart"></canvas>
-      </article>
-      <article class="card">
-        <h3>Salary Range Distribution</h3>
-        <canvas id="salaryChart"></canvas>
-      </article>
-      <article class="card">
-        <h3>Tech Stack Demand</h3>
-        <canvas id="stackChart"></canvas>
-      </article>
-    </section>
+      <section class="panel live-tracker-panel">
+        <div class="live-tracker-header">
+          <h2>India Live Hiring Tracker (Hourly)</h2>
+          <span id="indiaLiveTimestamp" class="live-badge"></span>
+        </div>
+        <div class="live-tracker-kpis" id="indiaLiveKpis"></div>
+        <div class="live-tracker-grid">
+          <article>
+            <h3>Posted vs Deleted Jobs by Role</h3>
+            <canvas id="indiaLiveRoleChart"></canvas>
+          </article>
+          <article>
+            <h3>Posted vs Deleted Jobs by Category</h3>
+            <table id="indiaLiveCategoryTable">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Posted/hr</th>
+                  <th>Deleted/hr</th>
+                  <th>Net/hr</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </article>
+        </div>
+      </section>
 
-    <section class="card">
-      <h3>Market Comparison Table</h3>
-      <div class="table-wrap">
-        <table>
+      <section class="panel-grid">
+        <article class="panel">
+          <h2>Role Demand Comparison</h2>
+          <canvas id="rolesChart"></canvas>
+        </article>
+        <article class="panel">
+          <h2>Compensation Comparison</h2>
+          <canvas id="payChart"></canvas>
+        </article>
+        <article class="panel">
+          <h2>Experience Requirement Distribution</h2>
+          <canvas id="experienceChart"></canvas>
+        </article>
+        <article class="panel">
+          <h2>Tech Stack Demand</h2>
+          <canvas id="stackChart"></canvas>
+        </article>
+      </section>
+
+      <section class="panel map-panel">
+        <h2>Hiring Activity Map</h2>
+        <div id="mapChart"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Detailed Comparison Table</h2>
+        <table id="comparisonTable">
           <thead>
             <tr>
-              <th>Segment</th>
-              <th>Global</th>
-              <th>India</th>
-              <th>Difference</th>
+              <th>Role</th>
+              <th>Global Avg Package (USD)</th>
+              <th>India Avg Package (LPA INR)</th>
+              <th>Global Experience (yrs)</th>
+              <th>India Experience (yrs)</th>
+              <th>Top Global Stack</th>
+              <th>Top India Stack</th>
             </tr>
           </thead>
-          <tbody id="comparisonTable"></tbody>
+          <tbody></tbody>
         </table>
-      </div>
-    </section>
-  </main>
+      </section>
 
-  <script src="app.js"></script>
-</body>
+      <section class="panel">
+        <h2>Automatically Identified Trend Patterns</h2>
+        <ul id="patterns"></ul>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
 </html>
