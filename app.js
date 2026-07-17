@@ -83,7 +83,7 @@ const indiaRoleCategoryMap = {
   DevOps: "Infrastructure & Platform",
 };
 
-const indiaLiveHourlySnapshots = [
+const fallbackIndiaLiveHourlySnapshots = [
   {
     timestamp: "10:00",
     roles: {
@@ -147,7 +147,30 @@ const indiaLiveHourlySnapshots = [
 ];
 
 let indiaLiveRoleChart;
-let indiaLiveSnapshotIndex = 0;
+const INDIA_LIVE_TRACKER_STORAGE_KEYS = {
+  previousIds: "indiaLivePreviousIds",
+  hourlyBucket: "indiaLiveHourlyBucket",
+};
+const INDIA_LIVE_POLL_INTERVAL_MS = 60 * 1000;
+const INDIA_LIVE_FEED_URLS = [
+  "https://raw.githubusercontent.com/manoj-ambatii/playwright-mcp/main/linkedin-jobs.json",
+  "https://raw.githubusercontent.com/manoj-ambatii/playwright-mcp/main/naukri-external-jobs.json",
+];
+const INDIA_LOCATION_HINTS = [
+  "india",
+  "bengaluru",
+  "bangalore",
+  "hyderabad",
+  "pune",
+  "gurugram",
+  "gurgaon",
+  "chennai",
+  "mumbai",
+  "noida",
+  "delhi",
+  "kolkata",
+  "ahmedabad",
+];
 
 function renderSources() {
   document.getElementById("sources").textContent = `Data snapshots aggregated from: ${marketData.sources.join(
@@ -398,12 +421,12 @@ function aggregateCategoryMetrics(snapshot) {
   }, {});
 }
 
-function updateIndiaLiveTracker(snapshot) {
+function updateIndiaLiveTracker(snapshot, statusLabel = "Live") {
   const postedTotal = Object.values(snapshot.roles).reduce((sum, item) => sum + item.posted, 0);
   const deletedTotal = Object.values(snapshot.roles).reduce((sum, item) => sum + item.deleted, 0);
   const netTotal = postedTotal - deletedTotal;
 
-  document.getElementById("indiaLiveTimestamp").textContent = `Live hour: ${snapshot.timestamp} IST`;
+  document.getElementById("indiaLiveTimestamp").textContent = `${statusLabel} hour: ${snapshot.timestamp} IST`;
   document.getElementById("indiaLiveKpis").innerHTML = [
     { label: "Jobs Posted / Hour", value: postedTotal },
     { label: "Jobs Deleted / Hour", value: deletedTotal },
@@ -459,12 +482,175 @@ function updateIndiaLiveTracker(snapshot) {
   document.querySelector("#indiaLiveCategoryTable tbody").innerHTML = categoryRows.join("");
 }
 
+function classifyRoleFromTitle(title = "") {
+  const normalized = title.toLowerCase();
+  if (normalized.includes("ml") || normalized.includes("machine learning") || normalized.includes("ai")) {
+    return "AI/ML Engineer";
+  }
+  if (
+    normalized.includes("full stack") ||
+    normalized.includes("frontend") ||
+    normalized.includes("front end") ||
+    normalized.includes("backend") ||
+    normalized.includes("back end") ||
+    normalized.includes("software engineer") ||
+    normalized.includes("application developer")
+  ) {
+    return "Full Stack Developer";
+  }
+  if (normalized.includes("cloud") || normalized.includes("platform engineer") || normalized.includes("sre")) {
+    return "Cloud Engineer";
+  }
+  if (normalized.includes("security") || normalized.includes("cyber")) {
+    return "Cybersecurity Analyst";
+  }
+  if (normalized.includes("devops") || normalized.includes("site reliability")) {
+    return "DevOps";
+  }
+  return "Full Stack Developer";
+}
+
+function isIndiaJob(job) {
+  const source = (job.source || "").toLowerCase();
+  const location = (job.location || "").toLowerCase();
+  return source === "naukri" || INDIA_LOCATION_HINTS.some((hint) => location.includes(hint));
+}
+
+function safeParseArray(text) {
+  try {
+    const parsed = JSON.parse(text);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function safeParseStoredArray(text) {
+  try {
+    const parsed = JSON.parse(text || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function buildJobId(job) {
+  return (
+    job.applyUrl ||
+    job.externalUrl ||
+    `${job.title || ""}|${job.company || ""}|${job.location || ""}|${job.postedAt || ""}`.toLowerCase()
+  );
+}
+
+function getCurrentHourBucketIST() {
+  const now = new Date();
+  const istString = now.toLocaleString("en-US", { timeZone: "Asia/Kolkata", hour12: false });
+  const asIstDate = new Date(istString);
+  return `${asIstDate.getFullYear()}-${String(asIstDate.getMonth() + 1).padStart(2, "0")}-${String(
+    asIstDate.getDate()
+  ).padStart(2, "0")} ${String(asIstDate.getHours()).padStart(2, "0")}:00`;
+}
+
+async function fetchIndiaLiveJobs() {
+  const results = await Promise.allSettled(
+    INDIA_LIVE_FEED_URLS.map(async (url) => {
+      const response = await fetch(url, { cache: "no-store" });
+      if (!response.ok) {
+        throw new Error(`Fetch failed: ${response.status}`);
+      }
+      const text = await response.text();
+      return safeParseArray(text);
+    })
+  );
+
+  const jobs = results
+    .filter((result) => result.status === "fulfilled")
+    .flatMap((result) => result.value)
+    .filter((job) => job && typeof job === "object")
+    .filter(isIndiaJob);
+
+  if (!jobs.length) {
+    throw new Error("No live India jobs available");
+  }
+  return jobs;
+}
+
+function computeHourlySnapshotFromJobs(jobs) {
+  const currentIds = new Set(jobs.map(buildJobId).filter(Boolean));
+  const hourBucket = getCurrentHourBucketIST();
+  const storedBucket = localStorage.getItem(INDIA_LIVE_TRACKER_STORAGE_KEYS.hourlyBucket);
+  const storedPreviousIds = localStorage.getItem(INDIA_LIVE_TRACKER_STORAGE_KEYS.previousIds);
+  const previousIds = new Set(
+    storedBucket === hourBucket ? safeParseStoredArray(storedPreviousIds) : Array.from(currentIds)
+  );
+
+  const roleCounters = Object.fromEntries(roles.map((role) => [role, { posted: 0, deleted: 0 }]));
+  const currentRoleById = {};
+  const previousRoleById = {};
+
+  jobs.forEach((job) => {
+    const id = buildJobId(job);
+    if (!id) return;
+    currentRoleById[id] = classifyRoleFromTitle(job.title || "");
+  });
+
+  if (storedBucket === hourBucket && storedPreviousIds) {
+    try {
+      const persistedRoleMap = JSON.parse(localStorage.getItem("indiaLivePreviousRoleMap") || "{}");
+      Object.keys(persistedRoleMap).forEach((id) => {
+        previousRoleById[id] = persistedRoleMap[id];
+      });
+    } catch {
+      // ignore corrupted local storage
+    }
+  }
+
+  currentIds.forEach((id) => {
+    if (!previousIds.has(id)) {
+      const role = currentRoleById[id] || "Full Stack Developer";
+      roleCounters[role].posted += 1;
+    }
+  });
+
+  previousIds.forEach((id) => {
+    if (!currentIds.has(id)) {
+      const role = previousRoleById[id] || "Full Stack Developer";
+      roleCounters[role].deleted += 1;
+    }
+  });
+
+  localStorage.setItem(INDIA_LIVE_TRACKER_STORAGE_KEYS.hourlyBucket, hourBucket);
+  localStorage.setItem(INDIA_LIVE_TRACKER_STORAGE_KEYS.previousIds, JSON.stringify(Array.from(currentIds)));
+  localStorage.setItem("indiaLivePreviousRoleMap", JSON.stringify(currentRoleById));
+
+  const snapshotLabel = hourBucket.split(" ")[1];
+  return {
+    timestamp: snapshotLabel,
+    roles: roleCounters,
+  };
+}
+
+let fallbackSnapshotCursor = 0;
+
+function getFallbackSnapshot() {
+  const snapshot = fallbackIndiaLiveHourlySnapshots[fallbackSnapshotCursor];
+  fallbackSnapshotCursor = (fallbackSnapshotCursor + 1) % fallbackIndiaLiveHourlySnapshots.length;
+  return snapshot;
+}
+
+async function refreshIndiaLiveTracker() {
+  try {
+    const jobs = await fetchIndiaLiveJobs();
+    const snapshot = computeHourlySnapshotFromJobs(jobs);
+    updateIndiaLiveTracker(snapshot, "Live");
+  } catch {
+    updateIndiaLiveTracker(getFallbackSnapshot(), "Fallback");
+  }
+}
+
 function renderIndiaLiveTracker() {
-  updateIndiaLiveTracker(indiaLiveHourlySnapshots[indiaLiveSnapshotIndex]);
-  setInterval(() => {
-    indiaLiveSnapshotIndex = (indiaLiveSnapshotIndex + 1) % indiaLiveHourlySnapshots.length;
-    updateIndiaLiveTracker(indiaLiveHourlySnapshots[indiaLiveSnapshotIndex]);
-  }, 8000);
+  refreshIndiaLiveTracker();
+  setInterval(refreshIndiaLiveTracker, INDIA_LIVE_POLL_INTERVAL_MS);
 }
 
 renderSources();
