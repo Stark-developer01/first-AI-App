@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tech Hiring Trends Dashboard</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <h1>Tech Hiring Trends Dashboard</h1>
+    <nav>
+      <a class="active" href="/index.html">Home</a>
+      <a href="/global-patterns.html">Global Patterns</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h2>Global vs India Job Market Snapshot</h2>
+      <p>Track technology hiring trends by role, experience level, salary range, and required tech stack.</p>
+      <div class="kpi-grid" id="kpiGrid"></div>
+    </section>
+
+    <section class="grid-two">
+      <article class="card">
+        <h3>Role-wise Hiring Demand</h3>
+        <canvas id="roleChart"></canvas>
+      </article>
+      <article class="card">
+        <h3>Experience-wise Openings</h3>
+        <canvas id="experienceChart"></canvas>
+      </article>
+      <article class="card">
+        <h3>Salary Range Distribution</h3>
+        <canvas id="salaryChart"></canvas>
+      </article>
+      <article class="card">
+        <h3>Tech Stack Demand</h3>
+        <canvas id="stackChart"></canvas>
+      </article>
+    </section>
+
+    <section class="card">
+      <h3>Market Comparison Table</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Segment</th>
+              <th>Global</th>
+              <th>India</th>
+              <th>Difference</th>
+            </tr>
+          </thead>
+          <tbody id="comparisonTable"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
