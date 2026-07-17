@@ -38,13 +38,22 @@ const renderKPIs = () => {
   });
 };
 
-const commonDataset = (label, data, color) => ({
-  label,
-  data,
-  borderColor: color,
-  backgroundColor: `${color}66`,
-  borderWidth: 2
-});
+// 1. Updated dataset helper using explicit fallback colors Chart.js supports natively
+const commonDataset = (label, data, color) => {
+  // Translate your colors to clean RGBA string equivalents
+  const rgbaColor = color === "#395cff" ? "rgba(57, 92, 255, 0.4)" : "rgba(0, 166, 166, 0.4)";
+  return {
+    label,
+    data,
+    borderColor: color,
+    backgroundColor: rgbaColor,
+    borderWidth: 2
+  };
+};
+
+/* Keep all your renderKPIs, renderCharts, and renderComparisonTable functions exactly as they are */
+
+// 2. Wrap execution calls to guarantee canvas nodes exist when rendering starts
 
 const renderCharts = () => {
   new Chart(document.getElementById("roleChart"), {
@@ -119,6 +128,9 @@ const renderComparisonTable = () => {
   });
 };
 
-renderKPIs();
-renderCharts();
-renderComparisonTable();
+document.addEventListener("DOMContentLoaded", () => {
+  renderKPIs();
+  renderCharts();
+  renderComparisonTable();
+});
+
