@@ -1,38 +1,32 @@
 {
-    "timestamp": "10:00",
-    "generatedAt": "2026-07-18T05:07:30.738Z",
-    "status": "Live",
-    "roles": {
-      "AI/ML Engineer": {
-        "posted": 1,
-        "deleted": 0
-      },
-      "Full Stack Developer": {
-        "posted": 0,
-        "deleted": 1
-      },
-      "Cloud Engineer": {
-        "posted": 0,
-        "deleted": 1
-      },
-      "Cybersecurity Analyst": {
-        "posted": 0,
-        "deleted": 0
-      },
-      "DevOps": {
-        "posted": 0,
-        "deleted": 0
-      }
+  "timestamp": "20:00",
+  "generatedAt": "2026-07-18T14:51:18.117Z",
+  "status": "Live",
+  "roles": {
+    "AI/ML Engineer": {
+      "posted": 0,
+      "deleted": 1
     },
-    "jobsSeen": 2,
-    "_state": {
-      "currentIds": [
-        "a1",
-        "a4"
-      ],
-      "roleById": {
-        "a1": "DevOps",
-        "a4": "AI/ML Engineer"
-      }
+    "Full Stack Developer": {
+      "posted": 0,
+      "deleted": 0
+    },
+    "Cloud Engineer": {
+      "posted": 0,
+      "deleted": 0
+    },
+    "Cybersecurity Analyst": {
+      "posted": 0,
+      "deleted": 0
+    },
+    "DevOps": {
+      "posted": 0,
+      "deleted": 1
     }
+  },
+  "jobsSeen": 0,
+  "_state": {
+    "currentIds": [],
+    "roleById": {}
   }
+}
