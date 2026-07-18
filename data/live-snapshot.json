@@ -1,11 +1,11 @@
 {
   "timestamp": "20:00",
-  "generatedAt": "2026-07-18T14:51:18.117Z",
+  "generatedAt": "2026-07-18T14:54:54.282Z",
   "status": "Live",
   "roles": {
     "AI/ML Engineer": {
       "posted": 0,
-      "deleted": 1
+      "deleted": 0
     },
     "Full Stack Developer": {
       "posted": 0,
@@ -21,7 +21,7 @@
     },
     "DevOps": {
       "posted": 0,
-      "deleted": 1
+      "deleted": 0
     }
   },
   "jobsSeen": 0,
