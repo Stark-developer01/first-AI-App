@@ -1,0 +1,38 @@
+name: Update live hiring tracker
+
+on:
+  schedule:
+    # Every 4 hours. Free JSearch tier is 200 requests/month; this uses
+    # 1 request per run (~180/month), leaving headroom. Tighten or widen
+    # this if you change plans.
+    - cron: "0 */4 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  update-snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: changes_made
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Fetch jobs and update snapshot
+        env:
+          JOBS_API_KEY: ${{ secrets.JOBS_API_KEY }}
+        run: node scripts/update-live-tracker.mjs
+
+      - name: Commit updated snapshot
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update live hiring tracker snapshot"
+          file_pattern: data/live-snapshot.json
+          branch: changes_made
